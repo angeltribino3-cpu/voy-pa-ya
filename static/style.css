@@ -1,0 +1,111 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#map {
+    flex: 1;
+    width: 100%;
+}
+
+.panel-pasajero {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.header-brand h2 {
+    color: #111;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.header-brand .subtext {
+    font-size: 12px;
+    color: #666;
+}
+
+.input-group label {
+    font-size: 12px;
+    color: #444;
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 4px;
+    background: #f9f9f9;
+}
+
+.servicio-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-servicio {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+}
+
+.btn-servicio.active {
+    border-color: #ff6600;
+    background: #fff4ec;
+    color: #ff6600;
+}
+
+.metodo-pago select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.detalles-tarifa {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.btn-principal {
+    background: #ff6600;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-principal:hover {
+    background: #e65c00;
+}
+
+.btn-principal:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

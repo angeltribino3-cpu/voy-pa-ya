@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voy Pa' Ya - Panel Administrador Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #030814; color: #ffffff; padding: 24px; min-height: 100vh; scroll-behavior: smooth; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00d2ff; padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
+        .header h1 { font-size: 24px; color: #00d2ff; font-weight: 800; text-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
+
+        .tasa-box {
+            background: #0d1b3e; border: 2px solid #00d2ff; border-radius: 16px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 12px; box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+        }
+        .tasa-box label { font-size: 12px; color: #a0b2dc; font-weight: 700; }
+        .tasa-box input {
+            background: #070f26; border: 1px solid #1a2f66; color: #00e676; padding: 8px 12px;
+            border-radius: 10px; font-size: 16px; font-weight: 800; width: 110px; outline: none; text-align: center;
+        }
+        .btn-update-tasa {
+            background: linear-gradient(135deg, #00d2ff, #0088ff); color: #030814; border: none;
+            padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase;
+        }
+
+        /* Tarjetas de Métricas Interactivas (Clickeables) */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .card-stat {
+            background: #070f26; border: 1px solid #1a2f66; border-radius: 18px; padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.25s ease;
+            position: relative; overflow: hidden;
+        }
+        .card-stat:hover {
+            border-color: #00d2ff; transform: translateY(-4px);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.3); background: #0d1b3e;
+        }
+        .card-stat label { font-size: 12px; color: #a0b2dc; font-weight: 700; display: block; margin-bottom: 6px; cursor: pointer; }
+        .card-stat strong { font-size: 28px; color: #00d2ff; font-weight: 800; }
+        .card-hint { font-size: 10px; color: #00d2ff; font-weight: 700; margin-top: 8px; display: block; text-transform: uppercase; }
+
+        .section-grid { display: grid; grid-template-columns: 1fr; gap: 28px; }
+        .table-container { background: #070f26; border: 1px solid #1a2f66; border-radius: 20px; padding: 20px; transition: border-color 0.3s ease; }
+        .table-container.highlight { border-color: #00d2ff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.2); }
+        
+        .table-container h3 { font-size: 16px; color: #ff5500; margin-bottom: 16px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th, td { padding: 14px 12px; border-bottom: 1px solid #1a2f66; }
+        th { color: #a0b2dc; font-weight: 700; background: #0d1b3e; }
+        tr:hover { background: rgba(13, 27, 62, 0.5); }
+
+        .badge { padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+        .badge-pending { background: rgba(255, 85, 0, 0.2); color: #ff5500; border: 1px solid #ff5500; }
+        .badge-active { background: rgba(0, 230, 118, 0.2); color: #00e676; border: 1px solid #00e676; }
+
+        .bank-details { background: #0d1b3e; border: 1px solid #1a2f66; padding: 10px 14px; border-radius: 12px; font-size: 12px; color: #a0b2dc; display: flex; flex-direction: column; gap: 4px; }
+        .bank-details strong { color: #00d2ff; font-size: 13px; }
+        .account-number { font-family: monospace; font-size: 13px; color: #ffffff; font-weight: 700; background: #070f26; padding: 4px 8px; border-radius: 6px; border: 1px solid #1a2f66; display: inline-block; margin: 2px 0; }
+
+        .btn-action { background: #0d1b3e; border: 1px solid #1a2f66; color: #00d2ff; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 11px; }
+        .btn-success { background: #00e676; color: #030814; border: none; font-weight: 800; }
+        .btn-danger { background: #ff5252; color: white; border: none; font-weight: 800; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 5000; }
+        .modal-box { background: #070f26; border: 2px solid #00d2ff; border-radius: 20px; padding: 24px; width: 90%; max-width: 450px; box-shadow: 0 0 30px rgba(0,210,255,0.3); }
+        .modal-box h3 { font-size: 18px; color: #00d2ff; font-weight: 800; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { font-size: 12px; color: #a0b2dc; display: block; margin-bottom: 6px; font-weight: 700; }
+        .form-group input { width: 100%; background: #0d1b3e; border: 1px solid #1a2f66; border-radius: 10px; padding: 10px; color: white; outline: none; }
+        .preview-img { width: 100%; height: 160px; object-fit: cover; border-radius: 12px; border: 1px dashed #00d2ff; display: none; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Header Principal -->
+    <div class="header">
+        <h1>Control Central - Voy Pa' Ya</h1>
+        <div class="tasa-box">
+            <label for="inputTasaBCV">Tasa BCV del Día (VES/$):</label>
+            <input type="number" id="inputTasaBCV" value="135.41" step="0.01" onchange="actualizarTablaRetiros()">
+            <button class="btn-update-tasa" onclick="guardarTasa()">Guardar</button>
+        </div>
+    </div>
+
+    <!-- TARJETAS DE MÉTRICAS INTERACTIVAS -->
+    <div class="metrics-grid">
+        <div class="card-stat" onclick="irASeccion('secClientes')">
+            <label>👥 Clientes Registrados</label>
+            <strong id="cntClientes">154 Pasajeros</strong>
+            <span class="card-hint">➔ Ver lista de clientes</span>
+        </div>
+        <div class="card-stat" onclick="irASeccion('secChoferes')">
+            <label>🛵 Chóferes / Conductores</label>
+            <strong id="cntChoferes" style="color: #ff5500;">28 Verificados</strong>
+            <span class="card-hint" style="color:#ff5500;">➔ Ver lista de chóferes</span>
+        </div>
+        <div class="card-stat" onclick="irASeccion('secRetiros')">
+            <label>💳 Retiros Pendientes</label>
+            <strong style="color: #ff5500;" id="cntRetiros">2 Solicitudes</strong>
+            <span class="card-hint" style="color:#ff5500;">➔ Gestionar pagos</span>
+        </div>
+        <div class="card-stat" onclick="irASeccion('secComisiones')">
+            <label>💰 Recaudación Comisiones</label>
+            <strong style="color: #00e676;">$42.50 USD</strong>
+            <span class="card-hint" style="color:#00e676;">➔ Ver desglose de ganancias</span>
+        </div>
+    </div>
+
+    <div class="section-grid">
+
+        <!-- 1. RETIROS PENDIENTES -->
+        <div class="table-container" id="secRetiros">
+            <h3>
+                <span>💸 Solicitudes de Retiro de Billetera (Transferencia Bancaria)</span>
+                <span class="badge badge-pending">Acción Requerida</span>
+            </h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Chófer / Conductor</th>
+                        <th>Monto USD</th>
+                        <th>Monto VES</th>
+                        <th>Datos Bancarios Completos (Cuenta / Cédula / Teléfono)</th>
+                        <th>Estado</th>
+                        <th>Acción Administrador</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaRetiros">
+                    <tr id="fila-1">
+                        <td>
+                            <strong>Víctor Tribiño</strong><br>
+                            <span style="font-size:11px; color:#a0b2dc;">Moto Bera SBR</span>
+                        </td>
+                        <td><strong style="color:#00d2ff; font-size:16px;">$18.50 USD</strong></td>
+                        <td><strong style="color:#00e676; font-size:16px;" class="monto-ves">2,505.08 VES</strong></td>
+                        <td>
+                            <div class="bank-details">
+                                <strong>Banesco Banco Universal</strong>
+                                <span>N° Cuenta: <span class="account-number">0134-0182-55-1820098765</span></span>
+                                <span>Cédula / RIF: <strong>V-12.345.678</strong></span>
+                                <span>Teléfono Contacto: <strong>0412-0000000</strong></span>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-pending">Pendiente</span></td>
+                        <td>
+                            <div style="display:flex; flex-direction:column; gap:6px;">
+                                <button class="btn-action btn-success" onclick="abrirModalPago('fila-1', 'Víctor Tribiño', 18.50)">✓ Aprobar y Cargar Capture</button>
+                                <button class="btn-action btn-danger" onclick="rechazarRetiro(this)">✕ Rechazar</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr id="fila-2">
+                        <td>
+                            <strong>Carlos Mendoza</strong><br>
+                            <span style="font-size:11px; color:#a0b2dc;">Carro Chevrolet Aveo</span>
+                        </td>
+                        <td><strong style="color:#00d2ff; font-size:16px;">$35.00 USD</strong></td>
+                        <td><strong style="color:#00e676; font-size:16px;" class="monto-ves">4,739.35 VES</strong></td>
+                        <td>
+                            <div class="bank-details">
+                                <strong>BBVA Provincial</strong>
+                                <span>N° Cuenta: <span class="account-number">0108-0023-11-0100554433</span></span>
+                                <span>Cédula / RIF: <strong>V-18.765.432</strong></span>
+                                <span>Teléfono Contacto: <strong>0414-1112233</strong></span>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-pending">Pendiente</span></td>
+                        <td>
+                            <div style="display:flex; flex-direction:column; gap:6px;">
+                                <button class="btn-action btn-success" onclick="abrirModalPago('fila-2', 'Carlos Mendoza', 35.00)">✓ Aprobar y Cargar Capture</button>
+                                <button class="btn-action btn-danger" onclick="rechazarRetiro(this)">✕ Rechazar</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. REGISTRO DE CHÓFERES -->
+        <div class="table-container" id="secChoferes">
+            <h3><span>🛵 Registro General de Chóferes / Conductores Verificados</span></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conductor</th>
+                        <th>Cédula</th>
+                        <th>Vehículo / Placa</th>
+                        <th>Teléfono</th>
+                        <th>Calificación</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Víctor Tribiño</strong></td>
+                        <td>V-12.345.678</td>
+                        <td>Moto Bera SBR (ABC-123)</td>
+                        <td>0412-0000000</td>
+                        <td>4.9 ★</td>
+                        <td><span class="badge badge-active">Activo</span></td>
+                        <td><button class="btn-action" onclick="alert('Documentos de Víctor Tribiño: Licencia y Carnet Aprobados.')">📄 Ver Documentos</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Carlos Mendoza</strong></td>
+                        <td>V-18.765.432</td>
+                        <td>Chevrolet Aveo (XYZ-987)</td>
+                        <td>0414-1112233</td>
+                        <td>4.7 ★</td>
+                        <td><span class="badge badge-active">Activo</span></td>
+                        <td><button class="btn-action" onclick="alert('Documentos de Carlos Mendoza: Licencia y Carnet Aprobados.')">📄 Ver Documentos</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 3. REGISTRO DE CLIENTES -->
+        <div class="table-container" id="secClientes">
+            <h3><span>👥 Registro General de Clientes Pasajeros</span></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente Pasajero</th>
+                        <th>Teléfono</th>
+                        <th>Saldo Billetera</th>
+                        <th>Viajes Realizados</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ángel Tribiño</strong></td>
+                        <td>0412-9998877</td>
+                        <td><strong style="color:#00d2ff;">$0.72 USD</strong></td>
+                        <td>14 Viajes</td>
+                        <td><span class="badge badge-active">VIP</span></td>
+                        <td><button class="btn-action" onclick="recargarSaldo('Ángel Tribiño')">➕ Recargar Saldo</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>María Pérez</strong></td>
+                        <td>0424-5554433</td>
+                        <td><strong style="color:#00d2ff;">$5.00 USD</strong></td>
+                        <td>8 Viajes</td>
+                        <td><span class="badge badge-active">Activo</span></td>
+                        <td><button class="btn-action" onclick="recargarSaldo('María Pérez')">➕ Recargar Saldo</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 4. RECAUDACIÓN Y COMISIONES -->
+        <div class="table-container" id="secComisiones">
+            <h3><span>💰 Historial de Recaudación y Comisiones de la App (10%)</span></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Carrera</th>
+                        <th>Chófer</th>
+                        <th>Pasajero</th>
+                        <th>Monto Carrera</th>
+                        <th>Comisión App (10%)</th>
+                        <th>Fecha / Hora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#VY-8821</td>
+                        <td>Víctor Tribiño</td>
+                        <td>Ángel Tribiño</td>
+                        <td>$3.71 USD</td>
+                        <td><strong style="color:#00e676;">+$0.37 USD</strong></td>
+                        <td>Hoy - 02:15 PM</td>
+                    </tr>
+                    <tr>
+                        <td>#VY-8820</td>
+                        <td>Carlos Mendoza</td>
+                        <td>María Pérez</td>
+                        <td>$6.87 USD</td>
+                        <td><strong style="color:#00e676;">+$0.68 USD</strong></td>
+                        <td>Hoy - 01:40 PM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- MODAL PARA ADJUNTAR COMPROBANTE -->
+    <div class="modal-overlay" id="modalPagoOverlay">
+        <div class="modal-box">
+            <h3>Aprobar Pago a <span id="modalNombreChofer"></span></h3>
+            <p style="font-size:12px; color:#a0b2dc; margin-bottom:15px;">Monto: <strong style="color:#00e676;" id="modalMontoUSD"></strong></p>
+            
+            <div class="form-group">
+                <label>N° de Referencia Bancaria:</label>
+                <input type="text" id="inputRefBancaria" placeholder="Ej: 009887123">
+            </div>
+
+            <div class="form-group">
+                <label>Adjuntar Captura / Comprobante (JPG/PNG):</label>
+                <input type="file" id="inputCapture" accept="image/*" onchange="previewCapture(event)">
+                <img id="imgPreview" class="preview-img" alt="Vista previa capture">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-action btn-success" style="flex:1; padding:12px;" onclick="confirmarEnvioComprobante()">Confirmar y Enviar al Chófer</button>
+                <button class="btn-action btn-danger" style="padding:12px;" onclick="cerrarModalPago()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let filaSeleccionadaId = null;
+
+    // Función para ir a la sección correspondiente al tocar las tarjetas superiores
+    function irASeccion(id) {
+        const elemento = document.getElementById(id);
+        if(elemento) {
+            elemento.scrollIntoView({ behavior: 'smooth' });
+            elemento.classList.add('highlight');
+            setTimeout(() => elemento.classList.remove('highlight'), 1500);
+        }
+    }
+
+    function guardarTasa() {
+        const nuevaTasa = parseFloat(document.getElementById('inputTasaBCV').value);
+        localStorage.setItem('tasa_bcv', nuevaTasa);
+        actualizarTablaRetiros();
+        alert(`¡Tasa oficial actualizada a ${nuevaTasa} VES/USD!`);
+    }
+
+    function actualizarTablaRetiros() {
+        const tasa = parseFloat(document.getElementById('inputTasaBCV').value) || 135.41;
+        const montosUSD = [18.50, 35.00];
+        const filasVES = document.querySelectorAll('.monto-ves');
+        filasVES.forEach((elem, idx) => {
+            if(montosUSD[idx]) {
+                let ves = (montosUSD[idx] * tasa).toLocaleString('es-VE', { minimumFractionDigits: 2 });
+                elem.innerText = `${ves} VES`;
+            }
+        });
+    }
+
+    function abrirModalPago(filaId, nombre, monto) {
+        filaSeleccionadaId = filaId;
+        document.getElementById('modalNombreChofer').innerText = nombre;
+        document.getElementById('modalMontoUSD').innerText = `$${monto.toFixed(2)} USD`;
+        document.getElementById('modalPagoOverlay').style.display = 'flex';
+    }
+
+    function cerrarModalPago() {
+        document.getElementById('modalPagoOverlay').style.display = 'none';
+        document.getElementById('inputRefBancaria').value = '';
+        document.getElementById('imgPreview').style.display = 'none';
+    }
+
+    function previewCapture(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('imgPreview');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function confirmarEnvioComprobante() {
+        const ref = document.getElementById('inputRefBancaria').value;
+        if (!ref) {
+            alert("Por favor ingresa el número de referencia bancaria.");
+            return;
+        }
+
+        if (filaSeleccionadaId) {
+            const tr = document.getElementById(filaSeleccionadaId);
+            tr.querySelector('.badge').className = 'badge badge-active';
+            tr.querySelector('.badge').innerText = 'Pagado';
+            tr.style.opacity = '0.7';
+
+            const celdaAccion = tr.querySelector('td:last-child');
+            celdaAccion.innerHTML = `
+                <div style="color:#00e676; font-size:11px; font-weight:800; background:#0d1b3e; padding:8px; border-radius:8px; border:1px solid #00e676;">
+                    ✓ Pago Enviado<br>
+                    <span>Ref: ${ref}</span><br>
+                    <span style="color:#00d2ff; text-decoration:underline; cursor:pointer;" onclick="alert('Mostrando captura enviada...')">📷 Ver Capture Enviado</span>
+                </div>
+            `;
+
+            alert(`¡Comprobante enviado automáticamente a la app del chófer! Ref: ${ref}`);
+            cerrarModalPago();
+        }
+    }
+
+    function rechazarRetiro(btn) {
+        let razon = prompt("Motivo del rechazo:");
+        if (razon) {
+            let tr = btn.closest('tr');
+            tr.querySelector('.badge').className = 'badge badge-pending';
+            tr.querySelector('.badge').style.borderColor = '#ff5252';
+            tr.querySelector('.badge').style.color = '#ff5252';
+            tr.querySelector('.badge').innerText = 'Rechazado';
+            btn.parentElement.innerHTML = `<span style="color:#ff5252; font-size:11px; font-weight:800;">✕ Rechazado</span>`;
+        }
+    }
+
+    function recargarSaldo(nombre) {
+        let monto = prompt(`Ingresa el saldo en USD a abonar a la billetera de ${nombre}:`, "5.00");
+        if(monto) alert(`Abonados $${monto} USD a la billetera de ${nombre}.`);
+    }
+
+    window.onload = function() {
+        const tasaGuardada = localStorage.getItem('tasa_bcv');
+        if (tasaGuardada) {
+            document.getElementById('inputTasaBCV').value = tasaGuardada;
+        }
+        actualizarTablaRetiros();
+    };
+</script>
+</body>
+</html>

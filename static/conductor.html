@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voy Pa' Ya - Conductor Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #f1f5f9; color: #1e293b; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        .app-container {
+            width: 100%; max-width: 414px; height: 100vh; max-height: 896px;
+            background: #ffffff; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); border: 2px solid #ff5500;
+        }
+
+        #map { flex: 1; width: 100%; z-index: 1; }
+
+        /* Header Flotante */
+        .top-navbar {
+            position: absolute; top: 16px; left: 16px; right: 16px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border: 1px solid #cbd5e1; border-radius: 18px; padding: 8px 14px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-menu {
+            background: #1e3a8a; border: none; color: #ffffff;
+            width: 38px; height: 38px; border-radius: 12px; font-size: 20px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 800;
+        }
+
+        .brand-logo-container { display: flex; align-items: center; gap: 8px; }
+        .logo-svg { width: 34px; height: 34px; filter: drop-shadow(0px 2px 4px rgba(255, 85, 0, 0.3)); }
+
+        .driver-profile { display: flex; align-items: center; gap: 8px; }
+        .avatar-img {
+            width: 36px; height: 36px; border-radius: 50%; background: #ff5500;
+            display: flex; align-items: center; justify-content: center; font-weight: 800;
+            font-size: 14px; color: #fff; border: 2px solid #ff5500; overflow: hidden;
+        }
+
+        .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
+        .switch input { display: none; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1; transition: .3s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #ff5500; }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        /* Sidebar / Menú Lateral */
+        .sidebar {
+            position: absolute; top: 0; left: -100%; width: 85%; height: 100%;
+            background: #ffffff; z-index: 3000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px 20px; display: flex; flex-direction: column; color: #1e293b; overflow-y: auto;
+            border-right: 3px solid #1e3a8a; box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+        }
+        .sidebar.active { left: 0; }
+
+        .sidebar-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); z-index: 2999; display: none;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        .menu-profile-header {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; text-align: center;
+        }
+
+        .menu-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .menu-item {
+            padding: 12px 14px; border-radius: 12px; background: #f8fafc;
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13px; font-weight: 700; cursor: pointer; color: #1e3a8a; border: 1px solid #cbd5e1;
+        }
+
+        /* Tarjeta Inferior de Métricas */
+        .driver-bottom-card {
+            background: #1e3a8a; border-radius: 24px 24px 0 0; padding: 18px;
+            z-index: 1000; display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.1); color: #ffffff;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px; padding: 10px 4px; text-align: center; cursor: pointer; transition: transform 0.2s;
+        }
+        .stat-box:active { transform: scale(0.95); }
+        .stat-box label { font-size: 9px; color: #cbd5e1; font-weight: 700; display: block; cursor: pointer; }
+        .stat-box strong { font-size: 12px; color: #ffffff; font-weight: 800; display: block; margin-top: 2px; }
+
+        /* Modales */
+        .modal-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; z-index: 4000; display: none; flex-direction: column;
+            padding: 20px; color: #1e293b; animation: slideUp 0.25s ease-out; overflow-y: auto;
+        }
+        .modal-screen.active { display: flex; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .btn-back { background: #f1f5f9; border: 1px solid #cbd5e1; color: #1e3a8a; width: 38px; height: 38px; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: 800; }
+
+        /* Tarjeta Alerta de Carrera */
+        .card-alerta {
+            position: absolute; bottom: 20px; left: 16px; right: 16px;
+            background: #ffffff; border: 2px solid #ff5500; border-radius: 24px;
+            padding: 20px; z-index: 2000; display: none; flex-direction: column; gap: 12px;
+            box-shadow: 0 10px 30px rgba(255, 85, 0, 0.25);
+        }
+
+        .desglose-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .desglose-row { display: flex; justify-content: space-between; font-size: 12px; }
+
+        .btn-aceptar { background: linear-gradient(135deg, #ff5500, #ff7700); color: #ffffff; border: none; padding: 15px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; width: 100%; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 85, 0, 0.3); }
+        .btn-accion-etapa { background: #1e3a8a; color: #ffffff; border: none; padding: 15px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; width: 100%; text-transform: uppercase; }
+
+        .btn-gps-center {
+            position: absolute; bottom: 110px; right: 16px; z-index: 1000;
+            background: #ffffff; border: 1px solid #cbd5e1; width: 42px; height: 42px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: #1e3a8a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header Flotante -->
+    <div class="top-navbar">
+        <button class="btn-menu" onclick="toggleMenu()">☰</button>
+        
+        <!-- LOGO OFICIAL VOY PA' YA -->
+        <div class="brand-logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="25" fill="#1E3A8A"/>
+                <path d="M25 30L50 80L75 30H60L50 55L40 30H25Z" fill="#FF5500"/>
+                <circle cx="50" cy="25" r="8" fill="#FF5500"/>
+            </svg>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:14px; font-weight:800; color:#1e3a8a; line-height:1;">VOY PA' YA</span>
+                <span style="font-size:8px; font-weight:800; color:#ff5500; letter-spacing:1px;">CONDUCTOR</span>
+            </div>
+        </div>
+
+        <div class="driver-profile">
+            <div class="avatar-img" id="topAvatar">Á</div>
+            <div class="driver-info">
+                <span id="txtEstado" style="font-size:11px; color:#16a34a; font-weight:800;">Disponible</span>
+            </div>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="chkEstado" checked onchange="cambiarEstado()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- Menú Lateral -->
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="menu-profile-header">
+            <svg style="width:60px; height:60px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="25" fill="#1E3A8A"/>
+                <path d="M25 30L50 80L75 30H60L50 55L40 30H25Z" fill="#FF5500"/>
+                <circle cx="50" cy="25" r="8" fill="#FF5500"/>
+            </svg>
+            <h3 style="font-size:18px; font-weight:800; margin-top:5px; color:#1e3a8a;">Voy Pa' Ya Pro</h3>
+            <span style="font-size:12px; color:#64748b; font-weight:700;">Ángel Tribiño ★ 4.9</span>
+        </div>
+
+        <ul class="menu-list">
+            <li class="menu-item" onclick="abrirModal('modalBilleteraDriver')">
+                <span>💳 Mi Billetera</span>
+                <strong style="color:#ff5500;" id="menuSaldo">$15.00 USD</strong>
+            </li>
+            <li class="menu-item" onclick="abrirModal('modalHistorial')">📜 Historial de Carreras</li>
+            <li class="menu-item" onclick="abrirModal('modalComisiones')">🧮 Calculadora de Comisión (20%)</li>
+            <li class="menu-item" onclick="abrirModal('modalDocumentos')">📄 Documentos del Vehículo</li>
+            <li class="menu-item" onclick="window.open('https://wa.me/584120000000')">🎧 Soporte Conductor</li>
+        </ul>
+    </div>
+
+    <!-- Mapa Modo Blanco/Gris Claro -->
+    <div id="map"></div>
+
+    <!-- Botón Mi Ubicación GPS -->
+    <button class="btn-gps-center" onclick="centrarGps()">🎯</button>
+
+    <!-- Barra Inferior Métricas -->
+    <div class="driver-bottom-card">
+        <div class="stats-grid">
+            <div class="stat-box" onclick="abrirModal('modalBilleteraDriver')">
+                <label>Billetera</label>
+                <strong id="lblSaldoBilletera">$15.00</strong>
+            </div>
+            <div class="stat-box" onclick="abrirModal('modalHistorial')">
+                <label>Carreras</label>
+                <strong id="lblCantCarreras">1 hoy</strong>
+            </div>
+            <div class="stat-box" onclick="abrirModal('modalAceptacion')">
+                <label>Aceptación</label>
+                <strong>98%</strong>
+            </div>
+            <div class="stat-box" onclick="abrirModal('modalComisiones')">
+                <label>Comisión</label>
+                <strong style="color:#ff7700;">20%</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES INTERACTIVOS -->
+    <div class="modal-screen" id="modalBilleteraDriver">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn-back" onclick="cerrarModal('modalBilleteraDriver')">←</button>
+            <h4 style="font-weight:800; color:#1e3a8a;">Mi Billetera</h4>
+            <div style="width:38px;"></div>
+        </div>
+        <div style="background:#f8fafc; border:2px solid #1e3a8a; border-radius:20px; padding:20px; text-align:center; margin:15px 0;">
+            <span style="font-size:12px; color:#64748b;">Saldo Disponible</span>
+            <h1 style="font-size:36px; font-weight:800; color:#1e3a8a; margin:6px 0;" id="modalSaldoDisplay">$15.00 USD</h1>
+            <button style="background:#ff5500; color:white; border:none; padding:12px; border-radius:12px; font-weight:800; width:100%; cursor:pointer;" onclick="solicitarRetiro()">Solicitar Retiro a Cuenta</button>
+        </div>
+    </div>
+
+    <div class="modal-screen" id="modalHistorial">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn-back" onclick="cerrarModal('modalHistorial')">←</button>
+            <h4 style="font-weight:800; color:#1e3a8a;">Carreras del Día</h4>
+            <div style="width:38px;"></div>
+        </div>
+        <div style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
+            <div style="background:#f8fafc; padding:14px; border-radius:14px; border:1px solid #cbd5e1;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <strong style="color:#1e3a8a;">👤 Pasajero: Ángel Tribiño</strong>
+                    <span style="color:#16a34a; font-weight:800;">$15.00 USD</span>
+                </div>
+                <p style="font-size:12px; color:#64748b;">📍 Monagas ➔ Maturín Centro</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-screen" id="modalComisiones">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn-back" onclick="cerrarModal('modalComisiones')">←</button>
+            <h4 style="font-weight:800; color:#1e3a8a;">Calculadora de Comisión</h4>
+            <div style="width:38px;"></div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:18px; padding:16px; margin-top:15px;">
+            <label style="font-size:12px; color:#64748b; font-weight:700;">Ingresa el Monto de la Carrera ($):</label>
+            <input type="number" id="calcMonto" value="15" oninput="calcularComisionDemo()" style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1; font-size:18px; font-weight:800; color:#1e3a8a; outline:none; margin-top:6px;">
+
+            <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px;">
+                    <span style="color:#64748b;">Tarifa Total del Viaje:</span>
+                    <strong id="demoTotal">$15.00 USD</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px;">
+                    <span style="color:#ff5500;">Comisión Voy Pa' Ya (20%):</span>
+                    <strong id="demoComision" style="color:#ff5500;">-$3.00 USD</strong>
+                </div>
+                <hr style="border-color:#cbd5e1;">
+                <div style="display:flex; justify-content:space-between; font-size:15px;">
+                    <span style="color:#16a34a; font-weight:800;">Tu Ganancia Neta (80%):</span>
+                    <strong id="demoGanancia" style="color:#16a34a; font-weight:800;">$12.00 USD</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-screen" id="modalAceptacion">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn-back" onclick="cerrarModal('modalAceptacion')">←</button>
+            <h4 style="font-weight:800; color:#1e3a8a;">Tasa de Aceptación</h4>
+            <div style="width:38px;"></div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:18px; padding:20px; text-align:center; margin-top:15px;">
+            <h1 style="font-size:42px; font-weight:800; color:#16a34a;">98%</h1>
+        </div>
+    </div>
+
+    <div class="modal-screen" id="modalDocumentos">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn-back" onclick="cerrarModal('modalDocumentos')">←</button>
+            <h4 style="font-weight:800; color:#1e3a8a;">Documentos del Vehículo</h4>
+            <div style="width:38px;"></div>
+        </div>
+        <div style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
+            <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #cbd5e1;">
+                <strong>Licencia de Conducir:</strong> <span style="color:#16a34a;">✓ Aprobada</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TARJETA DE ALERTA DE CARRERA -->
+    <div class="card-alerta" id="alertaViaje">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="background:rgba(255,85,0,0.1); color:#ff5500; padding:4px 10px; border-radius:8px; font-weight:800; font-size:12px;" id="lblServicio">🛵 MOTO</span>
+            <span style="font-size:24px; font-weight:800; color:#1e3a8a;" id="lblMontoTotal">$15.00 USD</span>
+        </div>
+
+        <div class="desglose-box">
+            <div class="desglose-row">
+                <span style="color:#64748b;">Origen:</span>
+                <strong id="lblOrigen">Maturín Centro</strong>
+            </div>
+            <div class="desglose-row">
+                <span style="color:#64748b;">Destino:</span>
+                <strong id="lblDestino">Las Avenidas</strong>
+            </div>
+            <div class="desglose-row">
+                <span style="color:#64748b;">Forma de Pago:</span>
+                <strong id="lblMetodoPago" style="color:#1e3a8a;">Efectivo</strong>
+            </div>
+            <hr style="border-color:#e2e8f0; margin:4px 0;">
+            <div class="desglose-row">
+                <span style="color:#ff5500;">Comisión Voy Pa' Ya (20%):</span>
+                <strong style="color:#ff5500;" id="lblComisionApp">-$3.00 USD</strong>
+            </div>
+            <div class="desglose-row" style="font-size:14px; margin-top:2px;">
+                <span style="color:#16a34a; font-weight:800;">Tu Ganancia Neta:</span>
+                <strong style="color:#16a34a; font-size:15px;" id="lblGananciaChofer">$12.00 USD</strong>
+            </div>
+        </div>
+
+        <div id="boxEtapas">
+            <button class="btn-aceptar" onclick="aceptarCarrera()">Aceptar Carrera</button>
+            <button style="background:transparent; border:1px solid #cbd5e1; color:#64748b; padding:10px; border-radius:12px; font-weight:700; font-size:13px; cursor:pointer; width:100%; margin-top:6px;" onclick="rechazarCarrera()">Omitir</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    let driverPos = [9.7489, -63.1794];
+    let map = L.map('map', { zoomControl: false }).setView(driverPos, 15);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap © CARTO'
+    }).addTo(map);
+
+    let driverMarker = L.marker(driverPos, {
+        icon: L.divIcon({
+            className: 'custom-driver-pin',
+            html: `<div style="background:#ff5500; width:30px; height:30px; border-radius:50%; border:3px solid #ffffff; display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 4px 15px rgba(255,85,0,0.4);">🛵</div>`,
+            iconSize: [32, 32]
+        })
+    }).addTo(map);
+
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                driverPos = [pos.coords.latitude, pos.coords.longitude];
+                driverMarker.setLatLng(driverPos);
+                map.setView(driverPos, 16);
+            },
+            (err) => {},
+            { enableHighAccuracy: true }
+        );
+    }
+
+    function centrarGps() { map.flyTo(driverPos, 16); }
+
+    let saldoBilletera = 15.00;
+
+    // FUNCIONES DE CONTROL DE NAVEGACIÓN Y MODALES
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('overlay').classList.toggle('active');
+    }
+
+    function abrirModal(id) {
+        if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+        document.getElementById(id).classList.add('active');
+    }
+
+    function cerrarModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    function calcularComisionDemo() {
+        let val = parseFloat(document.getElementById('calcMonto').value) || 0;
+        let com = val * 0.20;
+        let gan = val - com;
+        document.getElementById('demoTotal').innerText = `$${val.toFixed(2)} USD`;
+        document.getElementById('demoComision').innerText = `-$${com.toFixed(2)} USD`;
+        document.getElementById('demoGanancia').innerText = `$${gan.toFixed(2)} USD`;
+    }
+
+    function solicitarRetiro() {
+        let monto = prompt("Ingresa el monto a retirar hacia tu cuenta bancaria:", saldoBilletera.toFixed(2));
+        if(monto && parseFloat(monto) <= saldoBilletera) {
+            alert(`Solicitud de retiro de $${monto} USD enviada a la administración.`);
+        }
+    }
+
+    function cambiarEstado() {
+        const chk = document.getElementById('chkEstado').checked;
+        document.getElementById('txtEstado').innerText = chk ? "Disponible" : "Fuera de línea";
+        document.getElementById('txtEstado').style.color = chk ? "#16a34a" : "#64748b";
+    }
+
+    // WEBSOCKET DE CONEXIÓN DE ALERTAS
+    const ws = new WebSocket(`ws://${window.location.host}/ws/conductor`);
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.evento === "NUEVO_VIAJE") {
+            document.getElementById('lblMontoTotal').innerText = `$${data.monto_total.toFixed(2)} USD`;
+            document.getElementById('lblOrigen').innerText = data.origen;
+            document.getElementById('lblDestino').innerText = data.destino;
+            document.getElementById('lblMetodoPago').innerText = data.metodo_pago;
+            document.getElementById('lblComisionApp').innerText = `-$${data.comision_app.toFixed(2)} USD`;
+            document.getElementById('lblGananciaChofer').innerText = `$${data.ganancia_conductor.toFixed(2)} USD`;
+            document.getElementById('alertaViaje').style.display = 'flex';
+        }
+    };
+
+    function aceptarCarrera() {
+        alert("¡Carrera Aceptada!");
+        document.getElementById('alertaViaje').style.display = 'none';
+    }
+
+    function rechazarCarrera() {
+        document.getElementById('alertaViaje').style.display = 'none';
+    }
+</script>
+</body>
+</html>

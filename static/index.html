@@ -1,4 +1,144 @@
-<!-- Leaflet JS para hacer funcionar el mapa -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voy Pa' Ya - Pasajero</title>
+    <!-- Leaflet CSS para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+        .btn-cerrar {
+            background-color: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .btn-cerrar:hover {
+            background-color: #ef4444;
+            color: #fff;
+        }
+        .main-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        .panel-control {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            width: 320px;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .panel-control h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #f8fafc;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #fff;
+            outline: none;
+        }
+        .input-group input:focus {
+            border-color: #38bdf8;
+        }
+        .btn-pedir {
+            width: 100%;
+            padding: 12px;
+            background-color: #38bdf8;
+            color: #0f172a;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .btn-pedir:hover {
+            background-color: #0ea5e9;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🚗 Voy Pa' Ya</div>
+        <button class="btn-cerrar" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </header>
+
+    <div class="main-container">
+        <!-- El mapa -->
+        <div id="map"></div>
+
+        <!-- Panel flotante para pedir el viaje -->
+        <div class="panel-control">
+            <h2>¿A dónde vamos hoy?</h2>
+            <div class="input-group">
+                <label>Punto de partida</label>
+                <input type="text" id="origen" placeholder="Mi ubicación actual">
+            </div>
+            <div class="input-group">
+                <label>Destino</label>
+                <input type="text" id="destino" placeholder="¿A dónde vas?">
+            </div>
+            <button class="btn-pedir" onclick="pedirCarrera()">Pedir Viaje</button>
+        </div>
+    </div>
+
+    <!-- Leaflet JS para hacer funcionar el mapa -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // Inicializar el mapa
@@ -12,17 +152,15 @@
 
         var marcadorPasajero = null;
 
-        // Función para obtener la ubicación exacta del pasajero
+        // Obtener ubicación exacta del pasajero
         function obtenerUbicacionExacta() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
 
-                    // Centrar el mapa en la ubicación real del usuario
                     map.setView([lat, lng], 16);
 
-                    // Si ya hay un marcador anterior, lo movemos; si no, lo creamos
                     if (marcadorPasajero) {
                         marcadorPasajero.setLatLng([lat, lng]);
                     } else {
@@ -30,21 +168,16 @@
                             .bindPopup("¡Estás aquí, mi amor!").openPopup();
                     }
 
-                    // Opcional: rellenar automáticamente el campo de origen
                     document.getElementById('origen').value = "Mi ubicación actual";
 
                 }, function(error) {
                     console.error("No se pudo obtener la ubicación: ", error);
-                    alert("Por favor, activa los permisos de ubicación en tu dispositivo.");
                 }, {
                     enableHighAccuracy: true
                 });
-            } else {
-                alert("Tu navegador no soporta geolocalización.");
             }
         }
 
-        // Llamar a la función apenas cargue la página
         window.onload = function() {
             obtenerUbicacionExacta();
         };
@@ -60,4 +193,11 @@
             
             alert("¡Buscando conductor cercano para tu viaje desde " + origen + " hasta " + destino + "!");
         }
+
+        function cerrarSesion() {
+            localStorage.clear();
+            window.location.href = "/";
+        }
     </script>
+</body>
+</html>

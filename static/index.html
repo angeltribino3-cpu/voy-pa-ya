@@ -1,95 +1,63 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voy Pa' Ya - Tu viaje al instante</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #ffffff;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #38bdf8;
-            letter-spacing: 1px;
-        }
-        p {
-            color: #94a3b8;
-            margin-bottom: 30px;
-            font-size: 1rem;
-        }
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .btn {
-            padding: 14px 20px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: block;
-        }
-        .btn-pasajero {
-            background-color: #38bdf8;
-            color: #0f172a;
-        }
-        .btn-pasajero:hover {
-            background-color: #0ea5e9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
-        }
-        .btn-conductor {
-            background-color: transparent;
-            color: #ffffff;
-            border: 2px solid #38bdf8;
-        }
-        .btn-conductor:hover {
-            background-color: rgba(56, 189, 248, 0.1);
-            transform: translateY(-2px);
-        }
-    </style>
-</head>
-<body>
+<!-- Leaflet JS para hacer funcionar el mapa -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializar el mapa
+        var map = L.map('map').setView([9.2000, -66.5833], 15);
 
-    <div class="container">
-        <h1>Voy Pa' Ya</h1>
-        <p>¿Cómo deseas viajar hoy?</p>
-        
-        <div class="btn-group">
-            <!-- Cambia 'pasajero.html' o 'conductor.html' por los nombres de tus archivos reales -->
-            <a href="pasajero.html" class="btn btn-pasajero">Soy Pasajero</a>
-            <a href="conductor.html" class="btn btn-conductor">Soy Conductor</a>
-        </div>
-    </div>
+        // Cargar diseño del mapa
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
 
-</body>
-</html>
+        var marcadorPasajero = null;
+
+        // Función para obtener la ubicación exacta del pasajero
+        function obtenerUbicacionExacta() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+
+                    // Centrar el mapa en la ubicación real del usuario
+                    map.setView([lat, lng], 16);
+
+                    // Si ya hay un marcador anterior, lo movemos; si no, lo creamos
+                    if (marcadorPasajero) {
+                        marcadorPasajero.setLatLng([lat, lng]);
+                    } else {
+                        marcadorPasajero = L.marker([lat, lng]).addTo(map)
+                            .bindPopup("¡Estás aquí, mi amor!").openPopup();
+                    }
+
+                    // Opcional: rellenar automáticamente el campo de origen
+                    document.getElementById('origen').value = "Mi ubicación actual";
+
+                }, function(error) {
+                    console.error("No se pudo obtener la ubicación: ", error);
+                    alert("Por favor, activa los permisos de ubicación en tu dispositivo.");
+                }, {
+                    enableHighAccuracy: true
+                });
+            } else {
+                alert("Tu navegador no soporta geolocalización.");
+            }
+        }
+
+        // Llamar a la función apenas cargue la página
+        window.onload = function() {
+            obtenerUbicacionExacta();
+        };
+
+        function pedirCarrera() {
+            const origen = document.getElementById('origen').value;
+            const destino = document.getElementById('destino').value;
+            
+            if(!origen || !destino) {
+                alert("Por favor, completa el origen y el destino.");
+                return;
+            }
+            
+            alert("¡Buscando conductor cercano para tu viaje desde " + origen + " hasta " + destino + "!");
+        }
+    </script>

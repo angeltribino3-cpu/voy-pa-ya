@@ -3,562 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voy Pa' Ya - Pasajero Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Voy Pa' Ya - Tu viaje al instante</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #f1f5f9; color: #1e293b; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-
-        .app-container {
-            width: 100%; max-width: 414px; height: 100vh; max-height: 896px;
-            background: #ffffff; position: relative; overflow: hidden;
-            display: flex; flex-direction: column; border-radius: 28px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); border: 2px solid #1e3a8a;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        #map { flex: 1; width: 100%; z-index: 1; }
-
-        /* Header Flotante */
-        .top-navbar {
-            position: absolute; top: 16px; left: 16px; right: 16px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-            border: 1px solid #cbd5e1; border-radius: 18px; padding: 8px 14px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-
-        .btn-menu {
-            background: #1e3a8a; border: none; color: #ffffff;
-            width: 38px; height: 38px; border-radius: 12px; font-size: 20px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 800;
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            width: 100%;
         }
-
-        .brand-logo-container { display: flex; align-items: center; gap: 8px; }
-        .logo-svg { width: 34px; height: 34px; filter: drop-shadow(0px 2px 4px rgba(255, 85, 0, 0.3)); }
-
-        .user-wallet-badge {
-            background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 10px;
-            border-radius: 12px; font-size: 11px; font-weight: 800; color: #1e3a8a; cursor: pointer;
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #38bdf8;
+            letter-spacing: 1px;
         }
-
-        /* Sidebar / Menú Lateral */
-        .sidebar {
-            position: absolute; top: 0; left: -100%; width: 85%; height: 100%;
-            background: #ffffff; z-index: 3000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 25px 20px; display: flex; flex-direction: column; color: #1e293b; overflow-y: auto;
-            border-right: 3px solid #1e3a8a; box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+        p {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-size: 1rem;
         }
-        .sidebar.active { left: 0; }
-
-        .sidebar-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); z-index: 2999; display: none;
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
-        .sidebar-overlay.active { display: block; }
-
-        .menu-profile-header {
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-            padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; text-align: center;
+        .btn {
+            padding: 14px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
         }
-        .avatar-img {
-            width: 65px; height: 65px; border-radius: 50%; background: #ff5500;
-            display: flex; align-items: center; justify-content: center; font-weight: 800;
-            font-size: 24px; color: #fff; border: 2px solid #1e3a8a; overflow: hidden;
+        .btn-pasajero {
+            background-color: #38bdf8;
+            color: #0f172a;
         }
-
-        .menu-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .menu-item {
-            padding: 12px 14px; border-radius: 12px; background: #f8fafc;
-            display: flex; align-items: center; justify-content: space-between;
-            font-size: 13px; font-weight: 700; cursor: pointer; color: #1e3a8a; border: 1px solid #cbd5e1;
+        .btn-pasajero:hover {
+            background-color: #0ea5e9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
         }
-
-        /* TARJETA INFERIOR EN AZUL CORPORATIVO */
-        .card-donde-voy {
-            position: absolute; bottom: 20px; left: 16px; right: 16px; z-index: 1000;
-            background: #1e3a8a; border-radius: 22px; padding: 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); display: flex; flex-direction: column; gap: 12px; color: #ffffff;
+        .btn-conductor {
+            background-color: transparent;
+            color: #ffffff;
+            border: 2px solid #38bdf8;
         }
-        .search-trigger {
-            background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 10px;
-            color: #ffffff; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s;
+        .btn-conductor:hover {
+            background-color: rgba(56, 189, 248, 0.1);
+            transform: translateY(-2px);
         }
-
-        .quick-favs { display: flex; gap: 8px; }
-        .btn-fav {
-            flex: 1; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff; padding: 10px 8px; border-radius: 12px; font-size: 12px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
-        }
-
-        .card-buscando-active {
-            position: absolute; bottom: 20px; left: 16px; right: 16px; z-index: 2000;
-            background: #ffffff; border: 2px solid #ff5500; border-radius: 24px; padding: 20px;
-            display: none; flex-direction: column; gap: 12px; box-shadow: 0 10px 30px rgba(255, 85, 0, 0.25);
-        }
-
-        /* Modales */
-        .modal-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; z-index: 4000; display: none; flex-direction: column;
-            padding: 20px; color: #1e293b; animation: slideUp 0.25s ease-out; overflow-y: auto;
-        }
-        .modal-screen.active { display: flex; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .btn-back { background: #f1f5f9; border: 1px solid #cbd5e1; color: #1e3a8a; width: 38px; height: 38px; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: 800; }
-
-        .route-inputs { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .input-row { display: flex; align-items: center; gap: 10px; }
-        .input-row input { background: transparent; border: none; color: #1e3a8a; width: 100%; outline: none; font-size: 14px; font-weight: 700; }
-
-        /* Tarjetas de Selección de Transporte */
-        .vehicle-slider { display: flex; gap: 12px; padding: 10px 0; margin-top: 15px; }
-        .vehicle-card {
-            flex: 1; background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 18px;
-            padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.2s ease;
-        }
-        .vehicle-card.active { border-color: #ff5500; background: rgba(255, 85, 0, 0.08); box-shadow: 0 4px 15px rgba(255, 85, 0, 0.2); }
-
-        .btn-confirmar-principal {
-            background: linear-gradient(135deg, #ff5500, #ff7700); color: #ffffff; border: none; padding: 16px;
-            border-radius: 16px; font-weight: 800; font-size: 16px; width: 100%; cursor: pointer;
-            margin-top: auto; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 85, 0, 0.3);
-        }
-
-        .btn-gps-center {
-            position: absolute; bottom: 150px; right: 16px; z-index: 1000;
-            background: #ffffff; border: 1px solid #cbd5e1; width: 42px; height: 42px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: #1e3a8a;
-        }
-
-        .pago-movil-card {
-            background: #f8fafc; border: 2px solid #1e3a8a; border-radius: 18px; padding: 16px; margin: 15px 0;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .data-row { display: flex; justify-content: space-between; align-items: center; background: #ffffff; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 10px; }
-        .data-row span { font-size: 11px; color: #64748b; font-weight: 700; }
-        .data-row strong { font-size: 13px; color: #1e3a8a; font-weight: 800; }
-        .btn-copy { background: #1e3a8a; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="top-navbar">
-        <button class="btn-menu" onclick="toggleMenu()">☰</button>
-
-        <div class="brand-logo-container">
-            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="100" height="100" rx="25" fill="#1E3A8A"/>
-                <path d="M25 30L50 80L75 30H60L50 55L40 30H25Z" fill="#FF5500"/>
-                <circle cx="50" cy="25" r="8" fill="#FF5500"/>
-            </svg>
-            <div style="display:flex; flex-direction:column;">
-                <span style="font-size:14px; font-weight:800; color:#1e3a8a; line-height:1;">VOY PA' YA</span>
-                <span style="font-size:8px; font-weight:800; color:#ff5500; letter-spacing:1px;">PASAJERO</span>
-            </div>
-        </div>
-
-        <div class="user-wallet-badge" onclick="abrirModal('modalBilleteraClient')">
-            <span>💳 $0.72 USD</span>
-        </div>
-    </div>
-
-    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
-    <div class="sidebar" id="sidebar">
-        <div class="menu-profile-header">
-            <div class="avatar-img" id="menuAvatar">A</div>
-            <input type="file" id="inputFoto" accept="image/*" style="display:none;" onchange="actualizarFoto(event)">
-            <button style="background:#f1f5f9; border:1px solid #cbd5e1; padding:6px 12px; border-radius:10px; font-size:11px; font-weight:700; color:#1e3a8a; cursor:pointer;" onclick="document.getElementById('inputFoto').click()">📷 Cambiar Foto</button>
-            <h3 style="font-size:16px; font-weight:800; color:#1e3a8a; margin-top:4px;">Ángel Tribiño</h3>
-            <span style="font-size:11px; color:#64748b;">Pasajero VIP</span>
-        </div>
-
-        <ul class="menu-list">
-            <li class="menu-item" onclick="abrirModal('modalBilleteraClient')">
-                <span>💳 Billetera</span>
-                <strong style="color:#ff5500;">$0.72 USD</strong>
-            </li>
-            <li class="menu-item" onclick="abrirModal('modalHistorial')">📜 Historial de Viajes</li>
-            <li class="menu-item" onclick="abrirModal('modalReferidos')">🎁 Referidos ($1 Gratis)</li>
-            <li class="menu-item" onclick="window.open('https://wa.me/584120000000')">🎧 Soporte WhatsApp</li>
-        </ul>
-    </div>
-
-    <div id="map"></div>
-
-    <button class="btn-gps-center" onclick="centrarGps()">🎯</button>
-
-    <div class="card-donde-voy" id="cardDondeVoy">
-        <div class="search-trigger" onclick="abrirModal('modalRuta')">
-            <span style="color:#ff5500; font-size:20px;">📍</span>
-            <span>¿A dónde te llevamos hoy?</span>
-        </div>
-        <div class="quick-favs">
-            <button class="btn-fav" onclick="seleccionarFav('Maturín Centro', 3.2)">🏠 Centro (3.2 km)</button>
-            <button class="btn-fav" onclick="seleccionarFav('Las Avenidas', 4.8)">💼 Las Avenidas (4.8 km)</button>
-            <button class="btn-fav" onclick="seleccionarFav('Tipuro', 8.5)">🏢 Tipuro (8.5 km)</button>
-        </div>
-    </div>
-
-    <div class="card-buscando-active" id="cardBuscando">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:24px;">🛵</span>
-                <div>
-                    <h4 style="font-size:14px; font-weight:800; color:#ff5500;">Buscando conductor...</h4>
-                    <span style="font-size:11px; color:#64748b;">Notificando a unidades cercanas</span>
-                </div>
-            </div>
-            <span style="font-size:16px; font-weight:800; color:#1e3a8a;" id="timerBuscando">00:05</span>
-        </div>
-        <button onclick="cancelarBusqueda()" style="background:transparent; border:1px solid #ff5252; color:#ff5252; padding:10px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer; width:100%;">Cancelar Solicitud</button>
-    </div>
-
-    <div class="modal-screen" id="modalRuta">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalRuta')">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Ingresa tu Ruta</h4>
-            <div style="width:38px;"></div>
-        </div>
-
-        <div class="route-inputs">
-            <div class="input-row">
-                <span style="color:#1e3a8a; font-weight:800;">●</span>
-                <input type="text" id="origenText" value="Tu Ubicación Actual (Maturín)">
-            </div>
-            <hr style="border:0; border-top:1px solid #cbd5e1;">
-            <div class="input-row">
-                <span style="color:#ff5500; font-weight:800;">●</span>
-                <input type="text" id="destinoText" placeholder="Ingresa el destino" value="Tipuro, Maturín">
-            </div>
-        </div>
-
-        <button class="btn-confirmar-principal" onclick="confirmarRuta()">Calcular Tarifa por Distancia</button>
-    </div>
-
-    <div class="modal-screen" id="modalCotizacion">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalCotizacion'); abrirModal('modalRuta');">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Selecciona Transporte</h4>
-            <div style="width:38px;"></div>
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:12px; margin-top:12px; text-align:center;">
-            <span style="font-size:12px; color:#64748b; font-weight:700;">Distancia estimada del recorrido:</span>
-            <strong style="font-size:18px; color:#1e3a8a; display:block; margin-top:2px;" id="lblDistanciaKm">6.5 km</strong>
-        </div>
-
-        <div class="vehicle-slider">
-            <div class="vehicle-card active" id="cardMoto" onclick="seleccionarCat('moto')">
-                <span style="font-size:32px;">🛵</span>
-                <strong style="display:block; font-size:13px; margin-top:6px; color:#1e3a8a;">Moto Voy Pa' Ya</strong>
-                <span style="font-size:11px; color:#64748b; display:block;">$0.40 / km</span>
-                <span style="font-size:17px; color:#ff5500; font-weight:800; display:block; margin-top:4px;" id="montoMotoUSD">$2.60 USD</span>
-            </div>
-            <div class="vehicle-card" id="cardCarro" onclick="seleccionarCat('carro')">
-                <span style="font-size:32px;">🚗</span>
-                <strong style="display:block; font-size:13px; margin-top:6px; color:#1e3a8a;">Carro Económico</strong>
-                <span style="font-size:11px; color:#64748b; display:block;">$0.80 / km</span>
-                <span style="font-size:17px; color:#ff5500; font-weight:800; display:block; margin-top:4px;" id="montoCarroUSD">$5.20 USD</span>
-            </div>
-        </div>
-
-        <button class="btn-confirmar-principal" onclick="cerrarModal('modalCotizacion'); abrirModal('modalMetodoPago');">Siguiente (Elegir Pago)</button>
-    </div>
-
-    <div class="modal-screen" id="modalMetodoPago">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalMetodoPago'); abrirModal('modalCotizacion');">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Forma de Pago</h4>
-            <div style="width:38px;"></div>
-        </div>
-
-        <div style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
-            <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="procesarSolicitud('Billetera App')">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span>💳</span>
-                    <strong style="color:#1e3a8a;">Billetera App</strong>
-                </div>
-                <span style="color:#ff5500; font-weight:800;">$0.72 USD</span>
-            </div>
-
-            <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="procesarSolicitud('Pago Móvil')">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span>📲</span>
-                    <strong style="color:#1e3a8a;">Pago Móvil</strong>
-                </div>
-                <span style="color:#16a34a; font-weight:800;">Directo</span>
-            </div>
-
-            <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="abrirModal('modalEfectivo')">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span>💵</span>
-                    <strong style="color:#1e3a8a;">Efectivo</strong>
-                </div>
-                <span style="color:#1e3a8a; font-weight:800;">USD / VES</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-screen" id="modalEfectivo">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalEfectivo'); abrirModal('modalMetodoPago');">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Pago en Efectivo</h4>
-            <div style="width:38px;"></div>
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px; padding:15px; margin:15px 0;">
-            <label style="font-size:12px; color:#64748b;">Monto a pagar en USD ($)</label>
-            <input type="text" id="lblMontoEfectivoUSD" value="$2.60 USD" readonly style="width:100%; background:transparent; border:none; color:#1e3a8a; font-size:22px; font-weight:800; outline:none;">
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px; padding:15px; margin-bottom:20px;">
-            <label style="font-size:12px; color:#64748b;">Equivalente Estimado en Bolívares (Tasa BCV)</label>
-            <input type="text" id="lblMontoEfectivoVES" value="352.06 VES" readonly style="width:100%; background:transparent; border:none; color:#16a34a; font-size:22px; font-weight:800; outline:none;">
-        </div>
-
-        <button class="btn-confirmar-principal" onclick="procesarSolicitud('Efectivo')">Confirmar y Solicitar</button>
-    </div>
-
-    <div class="modal-screen" id="modalBilleteraClient">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalBilleteraClient')">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Mi Billetera</h4>
-            <div style="width:38px;"></div>
-        </div>
-        <div style="background:#f8fafc; border:2px solid #1e3a8a; border-radius:20px; padding:20px; text-align:center; margin:15px 0;">
-            <span style="font-size:12px; color:#64748b;">Saldo Disponible</span>
-            <h1 style="font-size:36px; font-weight:800; color:#1e3a8a; margin:6px 0;">$0.72 USD</h1>
-            <button style="background:#ff5500; color:white; border:none; padding:12px; border-radius:12px; font-weight:800; width:100%; cursor:pointer; margin-top:8px; text-transform:uppercase;" onclick="cerrarModal('modalBilleteraClient'); abrirModal('modalRecargarApp');">➕ Recargar la App</button>
-        </div>
-    </div>
-
-    <div class="modal-screen" id="modalRecargarApp">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalRecargarApp'); abrirModal('modalBilleteraClient');">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Recargar la App (Pago Móvil)</h4>
-            <div style="width:38px;"></div>
-        </div>
-
-        <p style="font-size:12px; color:#64748b; margin-top:10px; text-align:center;">Realiza el Pago Móvil a los datos oficiales de la empresa:</p>
-
-        <div class="pago-movil-card">
-            <div class="data-row">
-                <div><span>Banco Origen:</span><br><strong>Banesco (0134)</strong></div>
-                <button class="btn-copy" onclick="copiarTexto('0134')">Copiar</button>
-            </div>
-            <div class="data-row">
-                <div><span>Teléfono:</span><br><strong>0412-0000000</strong></div>
-                <button class="btn-copy" onclick="copiarTexto('04120000000')">Copiar</button>
-            </div>
-            <div class="data-row">
-                <div><span>Cédula / RIF:</span><br><strong>J-500000000</strong></div>
-                <button class="btn-copy" onclick="copiarTexto('J500000000')">Copiar</button>
-            </div>
-            
-            <button style="background:#1e3a8a; color:white; border:none; padding:10px; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer;" onclick="copiarTodosLosDatos()">📋 Copiar Todos los Datos</button>
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px; padding:14px; margin-bottom:15px;">
-            <h5 style="font-size:13px; color:#1e3a8a; font-weight:800; margin-bottom:10px;">Notificar Recarga</h5>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                <input type="number" id="inputMontoUSD" placeholder="Monto abonado en USD ($)" style="padding:10px; border-radius:8px; border:1px solid #cbd5e1; outline:none; font-size:12px;">
-                <input type="text" id="inputRefRecarga" placeholder="N° de Referencia Bancaria (6 a 8 dígitos)" style="padding:10px; border-radius:8px; border:1px solid #cbd5e1; outline:none; font-size:12px;">
-                <button class="btn-confirmar-principal" style="padding:12px; margin-top:6px;" onclick="enviarReporteRecarga()">Enviar Reporte de Pago</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-screen" id="modalHistorial">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalHistorial')">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Historial de Viajes</h4>
-            <div style="width:38px;"></div>
-        </div>
-        <div style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
-            <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #cbd5e1;">
-                <div style="display:flex; justify-content:space-between;">
-                    <strong>🛵 Moto Voy Pa' Ya</strong>
-                    <span style="color:#1e3a8a; font-weight:800;">-$2.60 USD</span>
-                </div>
-                <span style="font-size:11px; color:#64748b;">Maturín Centro ➔ Tipuro</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-screen" id="modalReferidos">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button class="btn-back" onclick="cerrarModal('modalReferidos')">←</button>
-            <h4 style="font-weight:800; color:#1e3a8a;">Referidos</h4>
-            <div style="width:38px;"></div>
-        </div>
-    </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    let clientPos = [9.7489, -63.1794];
-    let map = L.map('map', { zoomControl: false }).setView(clientPos, 15);
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap © CARTO',
-        maxZoom: 19
-    }).addTo(map);
-
-    let clientIcon = L.divIcon({
-        className: 'custom-client-pin',
-        html: `<div style="background:#1e3a8a; width:22px; height:22px; border-radius:50%; border:3px solid #ffffff; box-shadow:0 0 12px rgba(30,58,138,0.5);"></div>`,
-        iconSize: [24, 24]
-    });
-    let clientMarker = L.marker(clientPos, { icon: clientIcon }).addTo(map);
-
-    if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                clientPos = [pos.coords.latitude, pos.coords.longitude];
-                clientMarker.setLatLng(clientPos);
-                map.setView(clientPos, 16);
-            },
-            (err) => {},
-            { enableHighAccuracy: true }
-        );
-    }
-
-    function centrarGps() { map.flyTo(clientPos, 16); }
-
-    let servicioSeleccionado = 'moto';
-    let distanciaKmActual = 6.5;
-    let tarifaMonto = 2.60;
-    let timerInterval;
-
-    function toggleMenu() {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').classList.toggle('active');
-    }
-
-    function abrirModal(id) {
-        if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
-        document.getElementById(id).classList.add('active');
-    }
-    function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    function seleccionarFav(lugar, km) {
-        document.getElementById('destinoText').value = lugar;
-        distanciaKmActual = km;
-        recalcularTarifas(distanciaKmActual);
-        abrirModal('modalRuta');
-    }
-
-    // RECALCULO DE TARIFAS ($0.40 Moto / $0.80 Carro)
-    function recalcularTarifas(km) {
-        let precioMoto = Math.max(1.00, km * 0.40);
-        let precioCarro = Math.max(2.00, km * 0.80);
-
-        document.getElementById('lblDistanciaKm').innerText = `${km.toFixed(1)} km`;
-        document.getElementById('montoMotoUSD').innerText = `$${precioMoto.toFixed(2)} USD`;
-        document.getElementById('montoCarroUSD').innerText = `$${precioCarro.toFixed(2)} USD`;
-
-        tarifaMonto = (servicioSeleccionado === 'moto') ? precioMoto : precioCarro;
-        actualizarMontosPago();
-    }
-
-    function seleccionarCat(tipo) {
-        servicioSeleccionado = tipo;
-        document.getElementById('cardMoto').classList.remove('active');
-        document.getElementById('cardCarro').classList.remove('active');
-
-        if(tipo === 'moto') {
-            document.getElementById('cardMoto').classList.add('active');
-        } else {
-            document.getElementById('cardCarro').classList.add('active');
-        }
-        recalcularTarifas(distanciaKmActual);
-    }
-
-    function actualizarMontosPago() {
-        let tasa = parseFloat(localStorage.getItem('tasa_bcv')) || 135.41;
-        document.getElementById('lblMontoEfectivoUSD').value = `$${tarifaMonto.toFixed(2)} USD`;
-        document.getElementById('lblMontoEfectivoVES').value = `${(tarifaMonto * tasa).toFixed(2)} VES`;
-    }
-
-    function confirmarRuta() {
-        cerrarModal('modalRuta');
-        recalcularTarifas(distanciaKmActual);
-        abrirModal('modalCotizacion');
-    }
-
-    async function procesarSolicitud(metodo) {
-        cerrarModal('modalEfectivo');
-        cerrarModal('modalMetodoPago');
-        cerrarModal('modalCotizacion');
+    <div class="container">
+        <h1>Voy Pa' Ya</h1>
+        <p>¿Cómo deseas viajar hoy?</p>
         
-        document.getElementById('cardDondeVoy').style.display = 'none';
-        document.getElementById('cardBuscando').style.display = 'flex';
+        <div class="btn-group">
+            <!-- Cambia 'pasajero.html' o 'conductor.html' por los nombres de tus archivos reales -->
+            <a href="pasajero.html" class="btn btn-pasajero">Soy Pasajero</a>
+            <a href="conductor.html" class="btn btn-conductor">Soy Conductor</a>
+        </div>
+    </div>
 
-        let segundos = 0;
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            segundos++;
-            let mins = Math.floor(segundos / 60).toString().padStart(2, '0');
-            let secs = (segundos % 60).toString().padStart(2, '0');
-            document.getElementById('timerBuscando').innerText = `${mins}:${secs}`;
-        }, 1000);
-
-        const orig = document.getElementById('origenText').value;
-        const dest = document.getElementById('destinoText').value;
-
-        try {
-            await fetch('/api/solicitar-viaje', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    origen_texto: orig,
-                    destino_texto: dest,
-                    tipo_servicio: servicioSeleccionado,
-                    monto: tarifaMonto,
-                    metodo_pago: metodo
-                })
-            });
-        } catch (e) {
-            console.log("Solicitud enviada");
-        }
-    }
-
-    function cancelarBusqueda() {
-        clearInterval(timerInterval);
-        document.getElementById('cardBuscando').style.display = 'none';
-        document.getElementById('cardDondeVoy').style.display = 'flex';
-    }
-
-    function copiarTexto(texto) {
-        navigator.clipboard.writeText(texto);
-        alert(`¡Copiado: ${texto}!`);
-    }
-
-    function copiarTodosLosDatos() {
-        const datos = "PAGO MÓVIL VOY PA' YA:\nBanco: Banesco (0134)\nTeléfono: 04120000000\nCédula/RIF: J500000000";
-        navigator.clipboard.writeText(datos);
-        alert("¡Datos de Pago Móvil copiados!");
-    }
-
-    function enviarReporteRecarga() {
-        const monto = document.getElementById('inputMontoUSD').value;
-        const ref = document.getElementById('inputRefRecarga').value;
-        if(!monto || !ref) { alert("Ingresa monto y número de referencia."); return; }
-        alert(`¡Reporte enviado de $${monto} USD (Ref: ${ref})!`);
-        cerrarModal('modalRecargarApp');
-    }
-
-    function actualizarFoto(event) {
-        const reader = new FileReader();
-        reader.onload = function() { document.getElementById('menuAvatar').innerHTML = `<img src="${reader.result}" alt="Perfil">`; }
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
 </body>
 </html>

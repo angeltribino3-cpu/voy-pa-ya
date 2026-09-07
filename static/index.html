@@ -19,34 +19,71 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
+        /* Header Superior */
         header {
-            background: #1e293b;
-            padding: 15px 20px;
+            background: #ffffff;
+            color: #0f172a;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1001;
         }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #38bdf8;
-        }
-        .btn-cerrar {
-            background-color: transparent;
-            border: 1px solid #ef4444;
-            color: #ef4444;
-            padding: 8px 15px;
+        .menu-btn {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-logo {
+            background: #ea580c;
+            color: white;
             font-weight: bold;
-            transition: all 0.3s ease;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 1.1rem;
         }
-        .btn-cerrar:hover {
-            background-color: #ef4444;
-            color: #fff;
+        .brand-text h1 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
         }
+        .brand-text span {
+            font-size: 0.7rem;
+            color: #c2410c;
+            font-weight: bold;
+            letter-spacing: 1px;
+            display: block;
+        }
+        .wallet-badge {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Contenedor principal con mapa */
         .main-container {
             display: flex;
             flex: 1;
@@ -55,145 +92,367 @@
         #map {
             flex: 1;
             height: 100%;
+            z-index: 1;
         }
-        .panel-control {
+
+        /* Panel Inferior Estilo App */
+        .panel-inferior {
             position: absolute;
             bottom: 20px;
-            left: 20px;
-            background: rgba(30, 41, 59, 0.95);
+            left: 15px;
+            right: 15px;
+            background: #1e3a8a;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            width: 320px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             z-index: 1000;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .panel-control h2 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: #f8fafc;
-        }
-        .input-group {
+        .panel-inferior h2 {
+            font-size: 1.1rem;
             margin-bottom: 12px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .input-group label {
-            display: block;
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .shortcut-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 6px;
+            border-radius: 14px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
             font-size: 0.85rem;
-            color: #94a3b8;
-            margin-bottom: 5px;
         }
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
+        .shortcut-btn:hover, .shortcut-btn.seleccionado {
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: bold;
+        }
+        .shortcut-btn span {
+            display: block;
+            font-size: 0.7rem;
+            color: #cbd5e1;
+            margin-top: 2px;
+        }
+        .shortcut-btn.seleccionado span {
+            color: #0f172a;
+        }
+
+        /* Detalles del Viaje Calculado */
+        .detalles-viaje {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: none;
             border: 1px solid #475569;
-            background: #0f172a;
-            color: #fff;
-            outline: none;
         }
-        .input-group input:focus {
-            border-color: #38bdf8;
+        .detalles-viaje p {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #f8fafc;
         }
         .btn-pedir {
             width: 100%;
-            padding: 12px;
-            background-color: #38bdf8;
-            color: #0f172a;
-            font-weight: bold;
+            background: #22c55e;
+            color: white;
             border: none;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
             cursor: pointer;
+            display: none;
             transition: background 0.3s;
-            margin-top: 10px;
         }
         .btn-pedir:hover {
-            background-color: #0ea5e9;
+            background: #16a34a;
+        }
+
+        /* Modal de Buscando Conductor */
+        .modal-buscando {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(56, 189, 248, 0.2);
+            border-top: 5px solid #38bdf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Menú Lateral (Drawer) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #0f172a;
+            z-index: 2000;
+            transition: left 0.3s ease;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .sidebar.open {
+            left: 0;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+        .sidebar-menu li a, .sidebar-menu button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 10px;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar-menu li a:hover, .sidebar-menu button:hover {
+            background: #1e293b;
+            color: #38bdf8;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1500;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
         }
     </style>
 </head>
 <body>
 
+    <!-- Header Superior -->
     <header>
-        <div class="logo">🚗 Voy Pa' Ya</div>
-        <button class="btn-cerrar" onclick="cerrarSesion()">Cerrar Sesión</button>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="brand-container">
+            <div class="brand-logo">V</div>
+            <div class="brand-text">
+                <h1>VOY PA' YA</h1>
+                <span>PASAJERO</span>
+            </div>
+        </div>
+        <div class="wallet-badge" id="saldo-billetera">
+            💳 $0.00 USD
+        </div>
     </header>
 
+    <!-- Menú Lateral (Drawer) -->
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Menú de Usuario</h3>
+            <button onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">✕</button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="alert('Sección de Perfil y Foto'); toggleMenu();">👤 Mi Perfil / Foto</a></li>
+            <li><a href="#" onclick="alert('Tu saldo actual es $0.00 USD'); toggleMenu();">💰 Billetera y Pagos</a></li>
+            <li><a href="#" onclick="alert('Soporte Voy Pa Ya: Escríbenos al centro de ayuda.'); toggleMenu();">🛠️ Soporte y Ayuda</a></li>
+            <li><button onclick="cerrarSesion()" style="color: #ef4444;">🚪 Cerrar Sesión</button></li>
+        </ul>
+    </div>
+
+    <!-- Pantalla de Buscando Conductor (Modal) -->
+    <div class="modal-buscando" id="modalBuscando">
+        <div class="spinner"></div>
+        <h2 id="texto-estado-busqueda" style="color: #38bdf8; margin-bottom: 10px;">Buscando conductor cercano...</h2>
+        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">Estamos contactando a los conductores disponibles en tu zona.</p>
+        <button onclick="cancelarBusqueda()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">Cancelar Solicitud</button>
+    </div>
+
+    <!-- Contenedor Principal con el Mapa -->
     <div class="main-container">
-        <!-- El mapa -->
         <div id="map"></div>
 
-        <!-- Panel flotante para pedir el viaje -->
-        <div class="panel-control">
-            <h2>¿A dónde vamos hoy?</h2>
-            <div class="input-group">
-                <label>Punto de partida</label>
-                <input type="text" id="origen" placeholder="Mi ubicación actual">
+        <!-- Panel Inferior Estilo App -->
+        <div class="panel-inferior">
+            <h2>📍 ¿A dónde te llevamos hoy?</h2>
+            
+            <!-- Atajos de Destino -->
+            <div class="shortcuts-grid">
+                <div class="shortcut-btn" id="btn-centro" onclick="seleccionarDestino('Centro', 9.7480, -63.1800, 3.5)">
+                    🏢 Centro
+                    <span>3.5 km</span>
+                </div>
+                <div class="shortcut-btn" id="btn-avenidas" onclick="seleccionarDestino('Las Avenidas', 9.7550, -63.1950, 5.2)">
+                    🛣️ Las Avenidas
+                    <span>5.2 km</span>
+                </div>
+                <div class="shortcut-btn" id="btn-tipuro" onclick="seleccionarDestino('Tipuro', 9.7820, -63.1550, 8.8)">
+                    🌴 Tipuro
+                    <span>8.8 km</span>
+                </div>
             </div>
-            <div class="input-group">
-                <label>Destino</label>
-                <input type="text" id="destino" placeholder="¿A dónde vas?">
+
+            <!-- Detalles y Cálculo del Viaje -->
+            <div class="detalles-viaje" id="detallesViaje">
+                <p><strong>Destino:</strong> <span id="lbl-destino">-</span></p>
+                <p><strong>Distancia estimada:</strong> <span id="lbl-distancia">-</span></p>
+                <p><strong>Tarifa sugerida:</strong> <span id="lbl-tarifa">-</span></p>
             </div>
-            <button class="btn-pedir" onclick="pedirCarrera()">Pedir Viaje</button>
+
+            <!-- Botón de Solicitar -->
+            <button class="btn-pedir" id="btnPedirViaje" onclick="solicitarViaje()">Confirmar y Solicitar Viaje</button>
         </div>
     </div>
 
-    <!-- Leaflet JS para hacer funcionar el mapa -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicializar el mapa
-        var map = L.map('map').setView([9.2000, -66.5833], 15);
+        let map;
+        let marcadorPasajero = null;
+        let destinoSeleccionado = null;
+        let tarifaActual = "";
 
-        // Cargar diseño del mapa
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        // Control del menú lateral
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
 
-        var marcadorPasajero = null;
+        // Inicializar el mapa centrado en Maturín con geolocalización exacta
+        window.addEventListener('DOMContentLoaded', () => {
+            map = L.map('map', {zoomControl: false}).setView([9.7441, -63.1843], 15);
 
-        // Obtener ubicación exacta del pasajero
-        function obtenerUbicacionExacta() {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            // Obtener ubicación exacta del pasajero
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
-
                     map.setView([lat, lng], 16);
-
+                    
                     if (marcadorPasajero) {
                         marcadorPasajero.setLatLng([lat, lng]);
                     } else {
                         marcadorPasajero = L.marker([lat, lng]).addTo(map)
-                            .bindPopup("¡Estás aquí, mi amor!").openPopup();
+                            .bindPopup("<b>¡Estás aquí!</b><br>Ubicación exacta del pasajero.").openPopup();
                     }
-
-                    document.getElementById('origen').value = "Mi ubicación actual";
-
                 }, function(error) {
-                    console.error("No se pudo obtener la ubicación: ", error);
-                }, {
-                    enableHighAccuracy: true
-                });
+                    alert("Por favor, activa los permisos de ubicación GPS en tu dispositivo.");
+                }, { enableHighAccuracy: true });
             }
+
+            // Cargar saldo de billetera
+            const saldoGuardado = localStorage.getItem('saldoVoyPaYa');
+            if (saldoGuardado) {
+                document.getElementById('saldo-billetera').innerText = `💳 $${parseFloat(saldoGuardado).toFixed(2)} USD`;
+            } else {
+                document.getElementById('saldo-billetera').innerText = "💳 $0.00 USD";
+            }
+        });
+
+        // Seleccionar destino y calcular kilómetros / tarifa
+        function seleccionarDestino(lugar, latDest, lngDest, km) {
+            destinoSeleccionado = lugar;
+            
+            // Marcar visualmente el botón seleccionado
+            document.querySelectorAll('.shortcut-btn').forEach(btn => btn.classList.remove('seleccionado'));
+            if(lugar === 'Centro') document.getElementById('btn-centro').classList.add('seleccionado');
+            if(lugar === 'Las Avenidas') document.getElementById('btn-avenidas').classList.add('seleccionado');
+            if(lugar === 'Tipuro') document.getElementById('btn-tipuro').classList.add('seleccionado');
+
+            // Calcular tarifa estimada (ejemplo: $1.00 base + $0.50 por km)
+            let tarifa = (1.50 + (km * 0.45)).toFixed(2);
+            tarifaActual = `$${tarifa} USD`;
+
+            // Mostrar sección de detalles
+            document.getElementById('lbl-destino').innerText = lugar;
+            document.getElementById('lbl-distancia').innerText = km + " km";
+            document.getElementById('lbl-tarifa').innerText = tarifaActual;
+            
+            document.getElementById('detallesViaje').style.display = 'block';
+            document.getElementById('btnPedirViaje').style.display = 'block';
         }
 
-        window.onload = function() {
-            obtenerUbicacionExacta();
-        };
-
-        function pedirCarrera() {
-            const origen = document.getElementById('origen').value;
-            const destino = document.getElementById('destino').value;
-            
-            if(!origen || !destino) {
-                alert("Por favor, completa el origen y el destino.");
+        // Solicitar Viaje y simular búsqueda de conductor
+        function solicitarViaje() {
+            if(!destinoSeleccionado) {
+                alert("Por favor selecciona un destino primero.");
                 return;
             }
-            
-            alert("¡Buscando conductor cercano para tu viaje desde " + origen + " hasta " + destino + "!");
+
+            // Mostrar modal de buscando conductor
+            document.getElementById('modalBuscando').style.display = 'flex';
+            document.getElementById('texto-estado-busqueda').innerText = "Buscando conductor cercano...";
+
+            // Simular que el conductor acepta después de 4 segundos
+            setTimeout(() => {
+                document.getElementById('texto-estado-busqueda').innerText = "¡Conductor encontrado! 🎉";
+                setTimeout(() => {
+                    document.getElementById('modalBuscando').style.display = 'none';
+                    alert("¡Tu conductor en camino hacia tu ubicación exacta!");
+                }, 1500);
+            }, 4000);
         }
 
+        function cancelarBusqueda() {
+            document.getElementById('modalBuscando').style.display = 'none';
+            alert("Has cancelado la búsqueda de viaje.");
+        }
+
+        // Cerrar sesión
         function cerrarSesion() {
             localStorage.clear();
             window.location.href = "/";
